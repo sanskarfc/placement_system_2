@@ -100,7 +100,7 @@
         $(document).on("click", ".opportunity-card", function () {
           var opp_id = $(this).data("opp-id");
           $.get(
-            "http://localhost:5000/api/cds/opportunities?opp_id=" + opp_id,
+            "http://localhost:5000/api/opportunities?opp_id=" + opp_id,
             function (data, status) {
               var oppDetails = data;
               $("#opportunity-details").html("");
