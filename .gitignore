@@ -3,4 +3,5 @@ package-lock.json
 package.json
 .env
 env_flask
+virtualenv_example
 
