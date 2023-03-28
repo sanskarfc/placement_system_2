@@ -57,6 +57,10 @@
 				<label for="company_id">Company ID:</label>
 				<input type="number" class="form-control" id="company_id" name="company_id" required>
 			</div>
+			<div class="form-group">
+				<label for="poc_email_id">Point of Contact Email ID</label>
+				<input type="text" class="form-control" id="poc_email_id" name="poc_email_id" required>
+			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 		<form id="req-form">
@@ -136,6 +140,7 @@
 
             $(document).ready(function() {
                 $('#opp-form').submit(function(event) {
+
                   // Stop the form from submitting normally
                   event.preventDefault();
                   
@@ -146,7 +151,8 @@
                     address_line_1: $('#address_line_1').val(),
                     address_line_2: $('#address_line_2').val(),
                     address_line_3: $('#address_line_3').val(),
-                    company_id: $('#company_id').val()
+                    company_id: $('#company_id').val(),
+                    poc_email_id: $('#poc_email_id').val()
                   };
                   
                   var jsonData = JSON.stringify(formData);
@@ -168,6 +174,7 @@
                   });
                 });
               });
+
         // Code to send data of the requirement form:
 
         const form = document.getElementById('req-form');
