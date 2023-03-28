@@ -1170,7 +1170,7 @@ def get_nahiii_pata():
     return 'successfully updated'
 
 @app.route('/api/cds/next_round', methods=['POST'])
-def delete_opportunity():
+def next_round_opportunity():
     if not ('email' in session ):
         session['url'] = 'index'
         return redirect(url_for('google'))
