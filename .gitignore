@@ -4,4 +4,3 @@ package.json
 .env
 env_flask
 virtualenv-example
-
