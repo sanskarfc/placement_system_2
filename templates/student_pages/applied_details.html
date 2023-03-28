@@ -100,13 +100,11 @@
         $(document).on("click", ".opportunity-card", function () {
           var opp_id = $(this).data("opp-id");
           $.get(
-            "http://localhost:5000/api/cds/opportunities/?opp_id=" + opp_id,
+            "http://localhost:5000/api/cds/opportunities?opp_id=" + opp_id,
             function (data, status) {
-              var opportunityDetails = data;
+              var oppDetails = data;
               $("#opportunity-details").html("");
-              for (var i = 0; i < opportunityDetails.length; i++) {
-                var oppDetails = opportunityDetails[i];
-                var oppDetails_row = "<tr><td></td>";
+                var oppDetails_row = "<tr>";
                 oppDetails_row += "<td>Opportunity Type: " + oppDetails.opp_type + "</td></tr>";
                 oppDetails_row += "<td>Opportunity Title: " + oppDetails.opp_title + "</td></tr>";
                 oppDetails_row += "<td>Company ID: " + oppDetails.company_id + "</td></tr>";
@@ -124,7 +122,6 @@
                 oppDetails_row += "<td>Deadline: " + oppDetails.deadline + "</td></tr>";
 
                 $("#opportunity-details").append(oppDetails_row);
-              }
             }
           );
           $("#opportunity-modal").modal("show");
