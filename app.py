@@ -1,7 +1,7 @@
 # pylint: disable=all
 import os
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
-# sdfsdf 
+
 # from flask.ext.jsonpify import jsonify
 from flask_mysqldb import MySQL
 import yaml
@@ -183,7 +183,7 @@ def get_opportunities():
         # similar process as in the above if block is followed based on the conditions specified in the query
         cur = mysql.connection.cursor()
         if status == 'applied':
-            query = "select * from selection_procedure where opp_id in (select opp_id from app_opp where student_id = %s)"
+            query =    " select * from (select  round_type, round_venue_link, round_number, opp_id, t1.company_id, company_name from (select round_type, round_venue_link, round_number, selection_procedure.opp_id, company_id from selection_procedure inner join opportunity on selection_procedure.opp_id = opportunity.opp_id) as t1 inner join company on company.company_id = t1.company_id) as t2 where t2.opp_id in (select OPP__ID from app_opp  where student_id = %s)";
             resultValue = cur.execute(query, (student_id,))
             field_names = [i[0] for i in cur.description]
             if resultValue > 0:
@@ -293,7 +293,7 @@ def add_new_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -328,7 +328,7 @@ def add_requirements():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
             USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -369,7 +369,7 @@ def delete_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']=='mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
         
     if USER != Occupation.CDS_EMPLOYEE:
@@ -709,7 +709,7 @@ def get_opportunity_by_id_for_cds_and_poc():
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
         
-    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']=='mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if(USER != Occupation.CDS_EMPLOYEE and USER != Occupation.COMPANY_POC):
@@ -768,7 +768,7 @@ def add_poccc():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -907,7 +907,7 @@ def cds_page():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/saumil_dashboard2.html')
 
@@ -922,7 +922,7 @@ def oppo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/view_opportunities.html')
 
@@ -937,7 +937,7 @@ def oppoo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_opportunity.html')
 
@@ -955,7 +955,7 @@ def oppooo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_poc.html')
 
@@ -975,7 +975,7 @@ def oppoooo_pages():
     
     cur = mysql.connection.cursor()
     email = session['email']
-    resultValue = cur.execute("SELECT * FROM opportunity INNER JOIN requirements ON opportunity.opp_id = requirements.opp_id where opportunity.opp_id in (select opp_id from point_of_contact where poc_email_id='"+email+"')")
+    resultValue = cur.execute(f"SELECT * FROM (select * from opportunity where poc_email_id = '{email}') as opportunity INNER JOIN requirements ON opportunity.opp_id = requirements.opp_id")
     field_names = [i[0] for i in cur.description]
     if resultValue > 0:
         opps = cur.fetchall()
@@ -1006,8 +1006,7 @@ def oppooooo_pages():
     opp_id = request.args.get('opp_id')
     cur = mysql.connection.cursor()
     email = session['email']
-    print("SELECT * from student where student_id in (select student_id from app_opp where opp_id="+opp_id+" and status != 'rejected'  )")
-    resultValue = cur.execute("SELECT * from student where student.student_id in (select student_id from app_opp where OPP__ID="+opp_id+" and status != 'rejected'  )")
+    resultValue = cur.execute("SELECT * from student where student.student_id in (select student_id from app_opp where OPP__ID="+opp_id+" and status != 'rejected' and status!='selected'  )")
     field_names = [i[0] for i in cur.description]
     if resultValue > 0:
         opps = cur.fetchall()
@@ -1035,7 +1034,7 @@ def student_result():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -1047,17 +1046,28 @@ def student_result():
     stud_id = data['student_id']
     cur = mysql.connection.cursor()
     if to_do == 'proceed':
-        query = "UPDATE app_opp SET status = 'selected' WHERE app_opp.OPP__ID = "+str(opp_id)+" and app_opp.student_id = "+str(stud_id)+";" 
-        print(query)
+        query = f"select round_number from selection_procedure where opp_id = {opp_id}"
+        cur.execute(query)
+        data = cur.fetchall()    
+        round_number = int(data[0][0])+1
+        query = f"UPDATE selection_procedure SET round_number = {round_number} WHERE opp_id = {opp_id};"
         cur.execute(query)
         mysql.connection.commit()
         cur.close()
     elif to_do == 'reject':
-        query = "UPDATE app_opp SET status = 'rejected' WHERE app_opp.OPP__ID = opportunity."+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+";"
+        query = "UPDATE app_opp SET status = 'rejected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+";"
         print(query)
         cur.execute(query)
         mysql.connection.commit()
         cur.close()
+    elif to_do == 'select':
+        query = "UPDATE app_opp SET status = 'selected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+";"
+        print(query)
+        cur.execute(query)
+        mysql.connection.commit()
+        cur.close()
+        
+        
     return jsonify({"message": "poc added successfully"}), 200
 
 @app.route('/student/opportunities/accepted')
@@ -1097,7 +1107,7 @@ def pooooc():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if session['email'] != 'sanskar.sharma@iitgn.ac.in':
+    if session['email'] != 'mihirsutaria007@gmail.com':
         return 'invalid accesss'
     return render_template('cds_pages/cds_student_profiles.html')
 
@@ -1114,7 +1124,7 @@ def get_nahi_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if (session['email']!='mihirsutaria007@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     
     cur = mysql.connection.cursor()
@@ -1147,7 +1157,7 @@ def get_nahiii_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='sanskar.sharma@iitgn.ac.in'):
+    if (session['email']!='mihirsutaria007@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     data = request.get_json()
     sid = data['student_id']
@@ -1169,32 +1179,6 @@ def get_nahiii_pata():
     cur.close()
     return 'successfully updated'
 
-@app.route('/api/cds/next_round', methods=['POST'])
-def next_round_opportunity():
-    if not ('email' in session ):
-        session['url'] = 'index'
-        return redirect(url_for('google'))
-    USER = session['occupation']
-    match USER:
-        case 'student':
-            USER = Occupation.STUDENT
-        case 'poc':
-            USER = Occupation.COMPANY_POC
-    if(USER == Occupation.STUDENT):
-        student_id = session['student_id']
-    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
-        USER = Occupation.CDS_EMPLOYEE
-        
-    if USER != Occupation.CDS_EMPLOYEE:
-        return jsonify({"error": "Invalid Access"}), 404
-    opportunity = request.get_json()
-    opp_id = opportunity['opp_id']
-    round_number = opportunity['round_number']
-    cur = mysql.connection.cursor()
-    cur.execute("UPDATE selection_procedure SET round_number = "+str(round_number + 1)+" WHERE selection_procedure.opp_id ="+str(opp_id))
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "round number increased by one"}), 200
 
 
 if __name__ == '__main__':
