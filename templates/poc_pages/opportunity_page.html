@@ -64,7 +64,9 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>Name</th>
+                    <th>Name</th>
+                    <th>Select in Opportunity</th>
+                    <th>Reject in Opportunity</th>
                 </tr>
               </thead>
               <tbody id="students">
@@ -103,10 +105,12 @@
                 var student = students[i];
                 var student_row = "<tr>";
                 student_row += "<td>" + student.student_first_name + " " + student.student_last_name + "</td>";
-                student_row += "<td><button class='proceed-btn' data-student-id='" + student.student_id + "' data-opp-id='" + opp_id + "'>Proceed</button></td>";
-                student_row += "<td><button class='reject-btn' data-student-id='" + student.student_id + "' data-opp-id='" + opp_id + "'>Reject</button></td></tr>";
+                student_row += "<td><button class='select-btn btn-success' data-student-id='" + student.student_id + "' data-opp-id='" + opp_id + "'>Selected</button></td>";
+                student_row += "<td><button class='reject-btn btn-danger' data-student-id='" + student.student_id + "' data-opp-id='" + opp_id + "'>Reject</button></td></tr>";
                 $("#students").append(student_row);
-              }
+              } 
+              doneButton = "<button class='proceed-btn btn-success' data-student-id='" + student.student_id + "' data-opp-id='" + opp_id + "'>Proceed To Next Round</button>";
+              $('#students').append(doneButton);
             });
             $("#opportunity-modal").modal("show");
           });
@@ -128,13 +132,13 @@
               dataType: "json",
               success: function(data, status) {
                 if (status == "success") {
-                  alert("Application submitted successfully.");
+                  alert("Round Complete.");
                 } else {
-                  alert("Application submission failed.");
+                  alert("Round Complete Failed");
                 }
               }
             });
-          });
+          }); 
 
           $(document).on("click", ".reject-btn", function() {
             var student_id = $(this).data("student-id");
@@ -152,13 +156,38 @@
               dataType: "json",
               success: function(data, status) {
                 if (status == "success") {
-                  alert("Application submitted successfully.");
+                  alert("Candidate Rejected Successfully.");
                 } else {
-                  alert("Application submission failed.");
+                  alert("Candidate Rejection Failed.");
                 }
               }
             });
-          });
+          }); 
+
+          $(document).on("click", ".select-btn", function() {
+            var student_id = $(this).data("student-id");
+            var opp_id = $(this).data("opp-id");
+            var dataToSend = {
+              student_id: student_id,
+              opp_id: opp_id,
+              to_do: "select"
+            };
+            $.ajax({
+              url: "http://localhost:5000/api/poc/opportunity/student",
+              type: "POST",
+              data: JSON.stringify(dataToSend),
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              success: function(data, status) {
+                if (status == "success") {
+                  alert("Student Selected in Opportunity.");
+                } else {
+                  alert("Student Selection Failed.");
+                }
+              }
+            });
+          }); 
+
         });
     </script>
   </body>
