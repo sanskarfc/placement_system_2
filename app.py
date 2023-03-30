@@ -248,7 +248,7 @@ def get_opportunities():
                 dict[field_names[i]] = opportunity_desc[i]
         return jsonify(dict)
 
-    return jsonify("No matches were found for your search criteria")
+    return jsonify({"error": "invalid status"})
 
 # @app.route('/api/opportunities', methods=['GET'])
 # def get_opportunity_by_id():
@@ -277,7 +277,7 @@ def get_opportunities():
 #         for i in range(len(cur.description)):
 #             dict[field_names[i]] = opportunity_desc[i]
 #         return jsonify(dict)
-#     return jsonify("No matches were found for your search criteria")
+#     return jsonify("{}")
 
 
 @app.route('/api/cds/opportunity', methods=['POST'])
@@ -293,7 +293,7 @@ def add_new_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'mihirsutaria007@gmail.com'):
+    if(session['email'] == 'banthia.shruhrid@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -328,7 +328,7 @@ def add_requirements():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'mihirsutaria007@gmail.com'):
+    if(session['email'] == 'banthia.shruhrid@gmail.com'):
             USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -369,7 +369,7 @@ def delete_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='mihirsutaria007@gmail.com'):
+    if(session['email']=='banthia.shruhrid@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
         
     if USER != Occupation.CDS_EMPLOYEE:
@@ -533,7 +533,7 @@ def get_student_by_id():
             dict[field_names[i]] = student_desc[i]
 
         return jsonify(dict) 
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 @app.route('/api/student/resume', methods=['GET'])
 def get_resume_by_id():
@@ -564,7 +564,7 @@ def get_resume_by_id():
                 dict[field_names[i]] = res_desc[j][i]
             final_list.append(dict)
         return jsonify(final_list)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 @app.route('/student/opportunities/applied', methods=['GET'])
 def applied_list():
@@ -619,7 +619,7 @@ def get_opportunity_by_id_for_poc():
 
         # return the list of dictionaries as json response
         return jsonify(final_opportunities)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 
 @app.route('/poc/opportunity/student', methods=['GET'])
@@ -656,7 +656,7 @@ def get_opportunity_by_id_and_round_no_for_poc():
 
         # return the list of dictionaries as json response
         return jsonify(final_students)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 
 @app.route('/api/poc/opportunity/selected', methods=['GET'])
@@ -691,7 +691,7 @@ def get_student_details_by_opportunity_id():
             final_students.append(dict)
         # return the list of dictionaries as json response
         return jsonify(final_students)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 
 
@@ -709,7 +709,7 @@ def get_opportunity_by_id_for_cds_and_poc():
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
         
-    if(session['email']=='mihirsutaria007@gmail.com'):
+    if(session['email']=='banthia.shruhrid@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if(USER != Occupation.CDS_EMPLOYEE and USER != Occupation.COMPANY_POC):
@@ -752,7 +752,7 @@ def get_opportunity_by_id_for_cds_and_poc():
             # return the list of dictionaries as json response
             return jsonify(final_opportunuities)
         
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 
 @app.route('/api/cds/poc_add', methods=['POST'])
@@ -768,7 +768,7 @@ def add_poccc():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'mihirsutaria007@gmail.com'):
+    if(session['email'] == 'banthia.shruhrid@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -907,7 +907,7 @@ def cds_page():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='mihirsutaria007@gmail.com'):
+    if(session['email']!='banthia.shruhrid@gmail.com'):
         return '. off'
     return render_template('saumil_pages/saumil_dashboard2.html')
 
@@ -922,7 +922,7 @@ def oppo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='mihirsutaria007@gmail.com'):
+    if(session['email']!='banthia.shruhrid@gmail.com'):
         return '. off'
     return render_template('saumil_pages/view_opportunities.html')
 
@@ -937,7 +937,7 @@ def oppoo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='mihirsutaria007@gmail.com'):
+    if(session['email']!='banthia.shruhrid@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_opportunity.html')
 
@@ -955,7 +955,7 @@ def oppooo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='mihirsutaria007@gmail.com'):
+    if(session['email']!='banthia.shruhrid@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_poc.html')
 
@@ -987,7 +987,7 @@ def oppoooo_pages():
             final_opps.append(dict)
         # return the list of dictionaries as json response
         return jsonify(final_opps)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 @app.route('/api/poc/opportunities/student',methods = ['GET'])
 def oppooooo_pages():
@@ -1019,7 +1019,7 @@ def oppooooo_pages():
         # return the list of dictionaries as json response
         print(jsonify(final_opps))
         return jsonify(final_opps)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 @app.route('/api/poc/opportunity/student', methods=['POST'])
 def student_result():
@@ -1034,7 +1034,7 @@ def student_result():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'mihirsutaria007@gmail.com'):
+    if(session['email'] == 'banthia.shruhrid@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -1107,7 +1107,7 @@ def pooooc():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if session['email'] != 'mihirsutaria007@gmail.com':
+    if session['email'] != 'banthia.shruhrid@gmail.com':
         return 'invalid accesss'
     return render_template('cds_pages/cds_student_profiles.html')
 
@@ -1124,7 +1124,7 @@ def get_nahi_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='mihirsutaria007@gmail.com'):
+    if (session['email']!='banthia.shruhrid@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     
     cur = mysql.connection.cursor()
@@ -1142,7 +1142,7 @@ def get_nahi_pata():
             final_students.append(dict)
         # return the list of dictionaries as json response
         return jsonify(final_students)
-    return jsonify("No matches were found for your search criteria")
+    return jsonify("{}")
 
 @app.route('/api/cds/student', methods=['POST'])
 def get_nahiii_pata():
@@ -1157,7 +1157,7 @@ def get_nahiii_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='mihirsutaria007@gmail.com'):
+    if (session['email']!='banthia.shruhrid@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     data = request.get_json()
     sid = data['student_id']

@@ -123,19 +123,7 @@
       // Set up the event handler for when the edit modal is opened
       $('#edit-modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
-          for(var i = 0; i < data.length; i++){
-            var student = data[i];
-            $('#edit-student-id').val(student.student_id);
-            $('#edit-first-name').val(student.student_first_name);
-            $('#edit-middle-name').val(student.student_middle_name);
-            $('#edit-last-name').val(student.student_last_name);
-            $('#edit-image').val(student.student_image); // Clear the file input field
-            $('#edit-dept').val(student.dept);
-            $('#edit-cpi').val(student.CPI);
-            $('#edit-active-backlogs').val(student.active_backlogs);
-            $('#edit-gender').val(student.gender);
-            $('#edit-study-year').val(student.study_year);
-          }
+        
       });
 
       // Set up the event handler for when the save changes button is clicked

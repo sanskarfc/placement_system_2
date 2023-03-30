@@ -88,8 +88,8 @@
                 opportunity_card += "<p><b>Round Type:</b> " + opportunity.round_type + "</p>";
                 opportunity_card += "<p><b>Round Venue Link:</b> " + opportunity.round_venue_link + "</p>";
                 opportunity_card += "<p><b>Round Number:</b> " + opportunity.round_number + "<p>";
-                opportunity_card += "<p><b>Round Date:</b> " + opportunity.round_date + "</p>";
-                opportunity_card += "<p><b>Opportunity Title:</b> " + opportunity.opp_title + "</p>";
+                opportunity_card += "<p><b>Company Name:</b> " + opportunity.company_name + "</p>";
+
               opportunity_card += "</div>";
               $("#opportunities").append(opportunity_card);
             }
@@ -105,21 +105,21 @@
               var oppDetails = data;
               $("#opportunity-details").html("");
                 var oppDetails_row = "<tr>";
-                oppDetails_row += "<td>Opportunity Type: " + oppDetails.opp_type + "</td></tr>";
-                oppDetails_row += "<td>Opportunity Title: " + oppDetails.opp_title + "</td></tr>";
-                oppDetails_row += "<td>Company ID: " + oppDetails.company_id + "</td></tr>";
+                oppDetails_row += "<td><b>Opportunity Type:</b> " + oppDetails.opp_type + "</td></tr>";
+                oppDetails_row += "<td><b>Opportunity Title:</b> " + oppDetails.opp_title + "</td></tr>";
+                oppDetails_row += "<td><b>Company ID: </b>" + oppDetails.company_id + "</td></tr>";
                 oppDetails_row +=
-                  "<td>Minimum CPI Requirement: " + oppDetails.min_cpi_req + "</td></tr>";
+                  "<td><b>Minimum CPI Requirement:</b> " + oppDetails.min_cpi_req + "</td></tr>";
                 oppDetails_row +=
-                  "<td>Active Backlog: " + oppDetails.active_backlog + "</td></tr>";
+                  "<td><b>Active Backlog:</b> " + oppDetails.active_backlog + "</td></tr>";
                 oppDetails_row +=
-                  "<td>Program Requirement: " + oppDetails.program_req + "</td></tr>";
-                oppDetails_row += "<td>Department Requirement: " + oppDetails.dept_req + "</td></tr>";
-                oppDetails_row += "<td>Year Requirement: " + oppDetails.year_req + "</td></tr>";
-                oppDetails_row += "<td>Salary: " + oppDetails.salary + "</td></tr>";
-                oppDetails_row += "<td>Opportunity Status: " + oppDetails.opp_status + "</td></tr>";
-                oppDetails_row += "<td>Posted On: " + oppDetails.posted_on + "</td></tr>";
-                oppDetails_row += "<td>Deadline: " + oppDetails.deadline + "</td></tr>";
+                  "<td><b>Program Requirement:</b> " + oppDetails.program_req + "</td></tr>";
+                oppDetails_row += "<td><b>Department Requirement:</b> " + oppDetails.dept_req + "</td></tr>";
+                oppDetails_row += "<td><b>Year Requirement:</b> " + oppDetails.year_req + "</td></tr>";
+                oppDetails_row += "<td><b>Salary: </b>" + oppDetails.salary + "</td></tr>";
+                oppDetails_row += "<td><b>Opportunity Status:</b> " + oppDetails.opp_status + "</td></tr>";
+                oppDetails_row += "<td><b>Posted On:</b> " + oppDetails.posted_on + "</td></tr>";
+                oppDetails_row += "<td><b>Deadline:</b> " + oppDetails.deadline + "</td></tr>";
 
                 $("#opportunity-details").append(oppDetails_row);
             }

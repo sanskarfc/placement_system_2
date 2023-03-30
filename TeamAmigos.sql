@@ -46,11 +46,16 @@
         address_line_2 VARCHAR(255) NOT NULL,
         address_line_3 VARCHAR(255) NOT NULL,
         company_id integer,
+        poc_email_id varchar(255) ,
         foreign key (company_id) references company(company_id) on update cascade
     );
+
+    INSERT INTO opportunity (opp_type, opp_title, address_line_1, address_line_2, address_line_3, poc_email_id,company_id)
+    VALUES ('internship', 'Software Engineering Intern', '123 Main St.', '', '','banthia.shruhrid@gmail.com', 1),('placement', 'Sales Representative', '246 Maple Rd.', '', '', 'banthia.shruhrid@gmail.com',1);
+    
     INSERT INTO opportunity (opp_type, opp_title, address_line_1, address_line_2, address_line_3, company_id)
     VALUES 
-    ('internship', 'Software Engineering Intern', '123 Main St.', '', '', 1),
+    ('internship', 'Software Engineering Intern', '123 Main St.', '', 'banthia.shruhrid@gmail.com', 1),
     ('placement', 'Marketing Manager', '456 Oak Ave.', '', '', 2),
     ('internship', 'Data Science Intern', '789 Elm St.', '', '', 3),
     ('placement', 'Sales Representative', '246 Maple Rd.', '', '', 4),
@@ -65,6 +70,8 @@
     ('placement', 'Hardware Design Placement', '1600 Amphitheatre Parkway', 'Mountain View', 'California', 3),
     ('internship', 'Mobile App Development Internship', '3500 Deer Creek Road', 'Palo Alto', 'California', 4),
     ('placement', 'Business Development Placement', '410 Terry Avenue North', 'Seattle', 'Washington', 5);
+    
+
 
     drop table if exists requirements;
     CREATE TABLE requirements(
@@ -111,7 +118,7 @@
     poc_email_id VARCHAR(255) CHECK (poc_email_id REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') PRIMARY KEY
     );
 
-    INSERT INTO point_of_contact VALUES ('John', '', 'Doe', 'HR Manager', 1, 'vefnv@gmail.com');
+    INSERT INTO point_of_contact VALUES ('John', '', 'Doe', 'HR Manager', 1, 'banthia.shruhrid@gmail.com');
     INSERT INTO point_of_contact VALUES ('Jane', '', 'Smith', 'Recruiter', 2, 'jane.smith@example.com');
     INSERT INTO point_of_contact VALUES ('David', '', 'Lee', 'Internship Coordinator', 3, 'david.lee@example.com');
     INSERT INTO point_of_contact VALUES ('Rachel', 'K', 'Johnson', 'Placement Coordinator', 4, 'rachel.johnson@example.com');
@@ -158,7 +165,7 @@
 
     INSERT INTO student (student_id, student_email_id, student_first_name, student_middle_name, student_last_name, student_image, dept, CPI, active_backlogs, gender, study_year)
     VALUES
-    (1, 'mihirsutaria007@gmail.com','Samantha', '', 'Johnson', 'https://drive.google.com/uc?export=view&id=18bYTlYqoilSHHO2rBEGKYRW_JE4FZ05i', 'CSE', 9.8, 'no', 'female', 3),
+    (1, 'mihirsutaria07@gmail.com','Samantha', '', 'Johnson', 'https://drive.google.com/uc?export=view&id=18bYTlYqoilSHHO2rBEGKYRW_JE4FZ05i', 'CSE', 9.8, 'no', 'female', 3),
     (2, 'shruhrid.banthia@iitgn.ac.in','Shruhrid', 'bunty', 'Doe', NULL, 'EE', 9.9, 'yes', 'male', 2),
     (3, 'dhyeykumar.thummar@iitgn.ac.in','Sarah', '', 'Wilson',NULL, 'CE', 8.2, 'no', 'female', 4),
     (4, 'a','Mihir', 'Michael', 'Taylor', NULL, 'CSE', 9.9, 'yes', 'male', 3),
@@ -230,7 +237,7 @@
         foreign key (OPP__ID) references opportunity(opp_id) on update cascade on delete cascade
     );
     INSERT INTO app_opp (student_id,  resume_id, OPP__ID, round_number_reached, status)
-    VALUES (1, 1, 1, 2, 'rejected');
+    VALUES (1, 1, 1, 2, 'selected');
     INSERT INTO app_opp (student_id, resume_id, OPP__ID, round_number_reached, status)
     VALUES (2, 2, 2, 0, 'eligible');
 
@@ -1251,11 +1258,6 @@
     CREATE INDEX application_index ON application(student_id);
     CREATE INDEX app_opp_index ON app_opp(student_id,status);
     
-    select * from app_opp where resume_id = 8;
+    select * from (select  round_type, round_venue_link, round_number, opp_id, t1.company_id, company_name from (select round_type, round_venue_link, round_number, selection_procedure.opp_id, company_id from selection_procedure inner join opportunity on selection_procedure.opp_id = opportunity.opp_id) as t1 inner join company on company.company_id = t1.company_id) as t2 where t2.opp_id in (select OPP__ID from app_opp  where student_id = 1);
     
-    select * from opportunity where company_id =1;
-    select * from requirements;
-    
-    select * from point_of_contact
-    
-
+    select * from selection_procedure;
