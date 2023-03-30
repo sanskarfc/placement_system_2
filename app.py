@@ -1180,6 +1180,57 @@ def get_nahiii_pata():
     return 'successfully updated'
 
 
+@app.route('/api/cds/update_round_details', methods=['POST'])
+def next_round_details():
+    if not ('email' in session ):
+        session['url'] = 'index'
+        return redirect(url_for('google'))
+    USER = session['occupation']
+    match USER:
+        case 'student':
+            USER = Occupation.STUDENT
+        case 'poc':
+            USER = Occupation.COMPANY_POC
+    if(USER == Occupation.STUDENT):
+        student_id = session['student_id']
+    if(session['email']=='banthia.shruhrid@gmail.com'):
+        USER = Occupation.CDS_EMPLOYEE        
+    if USER != Occupation.CDS_EMPLOYEE:
+        return jsonify({"error": "Invalid Access"}), 404
+    
+    opportunity = request.get_json()
+    opp_id = opportunity['opp_id']
+    round_type = opportunity['round_type']
+    round_date = opportunity['round_date']
+    round_link = opportunity['round_venue_link']
+    # print('---------------------------------Testing round_type------------------------: ', round_type)
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE selection_procedure SET round_type = '"+str(round_type)+"' WHERE selection_procedure.opp_id ="+str(opp_id))
+    mysql.connection.commit()
+    cur.execute("UPDATE selection_procedure SET round_venue_link = '"+str(round_link)+"' WHERE selection_procedure.opp_id ="+str(opp_id))
+    mysql.connection.commit()
+    cur.execute("UPDATE selection_procedure SET round_date = '"+str(round_date)+" 'WHERE selection_procedure.opp_id ="+str(opp_id))
+    mysql.connection.commit()
+    cur.close()
+    return jsonify({"message": "round number increased by one"}), 200
+
+
+@app.route('/cds/round_update')
+def poc_round_ka():
+    if not ('email' in session ):
+        session['url'] = 'index'
+        return redirect(url_for('google'))
+    USER = session['occupation']
+    match USER:
+        case 'student':
+            USER = Occupation.STUDENT
+        case 'poc':
+            USER = Occupation.COMPANY_POC
+    if session['email'] != 'banthia.shruhrid@gmail.com':
+        return 'invalid accesss'
+    return render_template('saumil_pages/round_details.html')
+
+
 
 if __name__ == '__main__':
     app.run('localhost',5000,debug=True)
