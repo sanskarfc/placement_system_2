@@ -293,7 +293,7 @@ def add_new_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -328,7 +328,7 @@ def add_requirements():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
             USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -369,7 +369,7 @@ def delete_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
         
     if USER != Occupation.CDS_EMPLOYEE:
@@ -709,7 +709,7 @@ def get_opportunity_by_id_for_cds_and_poc():
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
         
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
 
     if(USER != Occupation.CDS_EMPLOYEE and USER != Occupation.COMPANY_POC):
@@ -768,7 +768,7 @@ def add_poccc():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -907,7 +907,7 @@ def cds_page():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
         return '. off'
     return render_template('saumil_pages/saumil_dashboard2.html')
 
@@ -922,7 +922,7 @@ def oppo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
         return '. off'
     return render_template('saumil_pages/view_opportunities.html')
 
@@ -937,7 +937,7 @@ def oppoo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
         return '. off'
     return render_template('saumil_pages/add_opportunity.html')
 
@@ -955,7 +955,7 @@ def oppooo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='sanskar.sharma@iitgn.ac.in'):
         return '. off'
     return render_template('saumil_pages/add_poc.html')
 
@@ -1035,7 +1035,7 @@ def student_result():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -1097,7 +1097,7 @@ def pooooc():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if session['email'] != 'banthia.shruhrid@gmail.com':
+    if session['email'] != 'sanskar.sharma@iitgn.ac.in':
         return 'invalid accesss'
     return render_template('cds_pages/cds_student_profiles.html')
 
@@ -1114,7 +1114,7 @@ def get_nahi_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='banthia.shruhrid@gmail.com'):
+    if (session['email']!='sanskar.sharma@iitgn.ac.in'):
         return jsonify({"error": "Invalid Access"}), 404
     
     cur = mysql.connection.cursor()
@@ -1147,7 +1147,7 @@ def get_nahiii_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='banthia.shruhrid@gmail.com'):
+    if (session['email']!='sanskar.sharma@iitgn.ac.in'):
         return jsonify({"error": "Invalid Access"}), 404
     data = request.get_json()
     sid = data['student_id']
@@ -1182,7 +1182,7 @@ def next_round_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='sanskar.sharma@iitgn.ac.in'):
         USER = Occupation.CDS_EMPLOYEE
         
     if USER != Occupation.CDS_EMPLOYEE:
