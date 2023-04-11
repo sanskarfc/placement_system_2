@@ -293,7 +293,7 @@ def add_new_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -308,12 +308,31 @@ def add_new_opportunity():
     address_line_2 = opportunity['address_line_2']
     address_line_3 = opportunity['address_line_3']
     company_id = opportunity['company_id']
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO opportunity(opp_type, opp_title, address_line_1, address_line_2, address_line_3, company_id) VALUES(%s, %s, %s, %s, %s, %s)",
-                (opp_type, opp_title, address_line_1, address_line_2, address_line_3, company_id))
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "Opportunity added successfully"}), 200
+
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM opportunity WHERE opp_type=%s AND opp_title=%s AND company_id=%s FOR UPDATE",
+                    (opp_type, opp_title, company_id))
+        row = cur.fetchone()
+
+        # Check if row exists, if not, insert new row
+        if row is None:
+            cur.execute("INSERT INTO opportunity(opp_type, opp_title, address_line_1, address_line_2, address_line_3, company_id) VALUES(%s, %s, %s, %s, %s, %s)",
+                        (opp_type, opp_title, address_line_1, address_line_2, address_line_3, company_id))
+            mysql.connection.commit()
+            cur.close()
+            return jsonify({"message": "Opportunity added successfully"}), 200
+        else:
+            cur.close()
+            return jsonify({"message": "Opportunity already exists"}), 409
+
+    except Exception as e:
+        mysql.connection.rollback()
+        cur.close()
+        print(f"Error: {e}")
+        return jsonify({"message": "Error adding opportunity"}), 500
+
+        
 
 @app.route('/api/cds/requirements', methods=['POST'])
 def add_requirements():
@@ -328,7 +347,7 @@ def add_requirements():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
             USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -347,13 +366,31 @@ def add_requirements():
     opp_req = requirements['opp_req']
     posted_on = requirements['posted_on']
     deadline = requirements['deadline']
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO requirements(opp_id, min_cpi_req, active_backlog, program_req, dept_req, year_req, salary, opp_status, opp_req, posted_on, deadline) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (opp_id, min_cpi_req, active_backlog, program_req, dept_req, year_req, salary, opp_status, opp_req, posted_on, deadline))
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "Requirements added successfully"}), 200
 
+    # changed code 
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM requirements WHERE opp_id=%s FOR UPDATE", (opp_id,))
+        row = cur.fetchone()
+
+        # Check if row exists, if not, insert new row
+        if row is None:
+            cur.execute("INSERT INTO requirements(opp_id, min_cpi_req, active_backlog, program_req, dept_req, year_req, salary, opp_status, opp_req, posted_on, deadline) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                        (opp_id, min_cpi_req, active_backlog, program_req, dept_req, year_req, salary, opp_status, opp_req, posted_on, deadline))
+            mysql.connection.commit()
+        else:
+            # Update existing row
+            cur.execute("UPDATE requirements SET min_cpi_req=%s, active_backlog=%s, program_req=%s, dept_req=%s, year_req=%s, salary=%s, opp_status=%s, opp_req=%s, posted_on=%s, deadline=%s WHERE opp_id=%s",
+                        (min_cpi_req, active_backlog, program_req, dept_req, year_req, salary, opp_status, opp_req, posted_on, deadline, opp_id))
+            mysql.connection.commit()
+
+        cur.close()
+        return jsonify({"message": "Requirements added successfully"}), 200
+
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error: {e}")
+        return jsonify({"error": "Error adding requirements"}), 500
     
 
 @app.route('/api/cds/opportunity_delete', methods=['POST'])
@@ -369,20 +406,46 @@ def delete_opportunity():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
         
     if USER != Occupation.CDS_EMPLOYEE:
         return jsonify({"error": "Invalid Access"}), 404
     opportunity = request.get_json()
     opp_id = opportunity['opp_id']
+
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM opportunity WHERE opp_id ="+str(opp_id))
-    mysql.connection.commit()
-    cur.execute("DELETE FROM point_of_contact WHERE opp_id ="+str(opp_id))
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "Opportunity deleted successfully"}), 200
+
+    try:
+        # start a transaction
+        cur.execute("START TRANSACTION")
+
+        # select rows to be deleted with FOR UPDATE
+        cur.execute("SELECT * FROM opportunity WHERE opp_id = %s FOR UPDATE", (opp_id,))
+        cur.execute("SELECT * FROM point_of_contact WHERE opp_id = %s FOR UPDATE", (opp_id,))
+
+        # delete rows
+        cur.execute("DELETE FROM opportunity WHERE opp_id = %s", (opp_id,))
+        cur.execute("DELETE FROM point_of_contact WHERE opp_id = %s", (opp_id,))
+
+        # commit transaction
+        mysql.connection.commit()
+
+        # close cursor
+        cur.close()
+
+        return jsonify({"message": "Opportunity deleted successfully"}), 200
+
+    except Exception as e:
+        # rollback transaction in case of error
+        mysql.connection.rollback()
+
+        # close cursor
+        cur.close()
+
+        return jsonify({"message": f"Error deleting opportunity: {str(e)}"}), 500
+
+
 
 @app.route('/api/student/apply/', methods=['POST'])
 def apply():
@@ -403,11 +466,20 @@ def apply():
     opportunity = request.get_json()
     resume_id = opportunity['resume_id']
     opp_id = opportunity['opp_id']
-    cur = mysql.connection.cursor()
-    cur.execute(f"INSERT INTO app_opp(student_id, resume_id,OPP__ID,round_number_reached) VALUES({student_id}, {resume_id}, {opp_id}, 1)")
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "applied successfully"}), 200
+
+    
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM app_opp WHERE OPP__ID = %s FOR UPDATE", (opp_id,))
+        cur.execute("INSERT INTO app_opp(student_id, resume_id, OPP__ID, round_number_reached) VALUES (%s, %s, %s, 1)", (student_id, resume_id, opp_id))
+        mysql.connection.commit()
+        return jsonify({"message": "Applied successfully"}), 200
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({"message": "Error applying"}), 500
+    finally:
+        cur.close()
+
 
 @app.route('/api/poc/opportunity', methods=['POST'])
 def poc_opp():
@@ -430,11 +502,19 @@ def poc_opp():
     opp_id = opportunity['opp_id']
     round_number = opportunity['round_numbr']
     todo = opportunity['todo']
-    cur = mysql.connection.cursor()
-    cur.execute(f"INSERT INTO app_opp(student_id, opp_id, resume_id,OPP__ID,round_number_reached,status) VALUES({student_id}, {opp_id}, {resume_id}, {opp_id}, 1, 'eligible')")
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "Opportunity deleted successfully"}), 200
+
+    try:
+        cur = mysql.connection.cursor()
+        # Lock the row
+        cur.execute(f"SELECT * FROM app_opp WHERE opp_id = {opp_id} FOR UPDATE")
+        cur.execute(f"INSERT INTO app_opp(student_id, opp_id, resume_id,OPP__ID,round_number_reached,status) VALUES({student_id}, {opp_id}, {resume_id}, {opp_id}, 1, 'eligible')")
+        mysql.connection.commit()
+        cur.close()
+        return jsonify({"message": "Opportunity deleted successfully"}), 200
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({"message": "Error occurred"}), 500
+
 
 
 @app.route('/api/student/resume', methods=['POST'])
@@ -463,17 +543,17 @@ def upload_resume():
                 (resume_file, resume_file_name))
     mysql.connection.commit()
     cur.close()
+
     cur = mysql.connection.cursor()
-    
-    resume_id = cur.execute("select * from resume where resume_file='" + resume_file + "' and resume_file_name='"+resume_file_name+"';")
-    resume_id = cur.fetchall()[0][0]
-    # print(f"INSERT INTO app_opp(student_id, resume_id) VALUES(%s, %s)", (student_id, resume_id))
-    print("select resume_id from resume where resume_file='" + resume_file + "' and resume_file_name='"+resume_file_name+"'")
-    print(resume_id)
+    cur.execute("SELECT resume_id FROM resume WHERE resume_file = %s AND resume_file_name = %s FOR UPDATE",
+                (resume_file, resume_file_name))
+    resume_id = cur.fetchone()[0]
     cur.execute("INSERT INTO application(student_id, resume_id) VALUES(%s, %s);", (student_id, resume_id))
     mysql.connection.commit()
     cur.close()
+
     return jsonify({"message": "Resume uploaded successfully"}), 200
+
 
 
 @app.route('/api/student/image', methods=['POST'])
@@ -496,9 +576,10 @@ def upload_image():
     # Format student (studentid, student_image)
     id = student_id
     student_image = image['student_image']
+
     cur = mysql.connection.cursor()
     cur.execute(
-        "UPDATE student SET student_image = %s WHERE student_id = %s", (student_image, id))
+        "UPDATE student SET student_image = %s WHERE student_id = %s FOR UPDATE", (student_image, id))
     mysql.connection.commit()
     cur.close()
     return jsonify({"message": "Image uploaded successfully"}), 200
@@ -709,7 +790,7 @@ def get_opportunity_by_id_for_cds_and_poc():
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
         
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if(USER != Occupation.CDS_EMPLOYEE and USER != Occupation.COMPANY_POC):
@@ -768,7 +849,7 @@ def add_poccc():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -779,15 +860,21 @@ def add_poccc():
     employee_first_name = emp_data['employee_first_name']
     employee_last_name = emp_data['employee_last_name']
     employee_middle_name = emp_data['employee_middle_name']
-    opp_id = emp_data['opp_id']
     poc_email_id = emp_data['poc_email_id']
     
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO point_of_contact(employee_first_name,employee_middle_name,employee_last_name,employee_designation,opp_id,poc_email_id) VALUES(%s, %s, %s, %s, %s, %s)",
-                (employee_first_name,employee_middle_name,employee_last_name,employee_designation,opp_id,poc_email_id))
-    mysql.connection.commit()
-    cur.close()
-    return jsonify({"message": "poc added successfully"}), 200
+    try:
+        cur = mysql.connection.cursor()
+        # The above line locks the row(s) with the given opp_id
+        cur.execute("INSERT INTO point_of_contact(employee_first_name,employee_middle_name,employee_last_name,employee_designation,poc_email_id) VALUES(%s, %s, %s, %s, %s)",
+                    (employee_first_name,employee_middle_name,employee_last_name,employee_designation,poc_email_id))
+        mysql.connection.commit()
+        cur.close()
+        return jsonify({"message": "poc added successfully"}), 200
+
+    except:
+        mysql.connection.rollback()
+        return jsonify({"error": "Something went wrong, please try again later"}), 500
+
 
 
 @app.route('/poc')
@@ -907,7 +994,7 @@ def cds_page():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/saumil_dashboard2.html')
 
@@ -922,7 +1009,7 @@ def oppo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/view_opportunities.html')
 
@@ -937,7 +1024,7 @@ def oppoo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_opportunity.html')
 
@@ -955,7 +1042,7 @@ def oppooo_pages():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if(session['email']!='banthia.shruhrid@gmail.com'):
+    if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/add_poc.html')
 
@@ -1034,7 +1121,7 @@ def student_result():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email'] == 'banthia.shruhrid@gmail.com'):
+    if(session['email'] == 'mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE
 
     if USER != Occupation.CDS_EMPLOYEE:
@@ -1045,8 +1132,9 @@ def student_result():
     to_do = data['to_do']
     stud_id = data['student_id']
     cur = mysql.connection.cursor()
+
     if to_do == 'proceed':
-        query = f"select round_number from selection_procedure where opp_id = {opp_id}"
+        query = f"SELECT round_number FROM selection_procedure WHERE opp_id = {opp_id} FOR UPDATE"
         cur.execute(query)
         data = cur.fetchall()    
         round_number = int(data[0][0])+1
@@ -1055,20 +1143,19 @@ def student_result():
         mysql.connection.commit()
         cur.close()
     elif to_do == 'reject':
-        query = "UPDATE app_opp SET status = 'rejected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+";"
+        query = "UPDATE app_opp SET status = 'rejected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+" FOR UPDATE;"
         print(query)
         cur.execute(query)
         mysql.connection.commit()
         cur.close()
     elif to_do == 'select':
-        query = "UPDATE app_opp SET status = 'selected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+";"
+        query = "UPDATE app_opp SET status = 'selected' WHERE app_opp.OPP__ID ="+str(opp_id)+" and app_opp.student_id ="+str(stud_id)+" FOR UPDATE;"
         print(query)
         cur.execute(query)
         mysql.connection.commit()
         cur.close()
-        
-        
     return jsonify({"message": "poc added successfully"}), 200
+
 
 @app.route('/student/opportunities/accepted')
 def pooc():
@@ -1107,7 +1194,7 @@ def pooooc():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if session['email'] != 'banthia.shruhrid@gmail.com':
+    if session['email'] != 'mihirsutaria007@gmail.com':
         return 'invalid accesss'
     return render_template('cds_pages/cds_student_profiles.html')
 
@@ -1124,7 +1211,7 @@ def get_nahi_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='banthia.shruhrid@gmail.com'):
+    if (session['email']!='mihirsutaria007@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     
     cur = mysql.connection.cursor()
@@ -1157,7 +1244,7 @@ def get_nahiii_pata():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if (session['email']!='banthia.shruhrid@gmail.com'):
+    if (session['email']!='mihirsutaria007@gmail.com'):
         return jsonify({"error": "Invalid Access"}), 404
     data = request.get_json()
     sid = data['student_id']
@@ -1172,9 +1259,12 @@ def get_nahiii_pata():
     sy = data['study_year']
     
     cur = mysql.connection.cursor()
-    query = f"UPDATE student set student_first_name='{sfn}',student_middle_name = '{smn}', student_last_name = '{sln}',student_image = '{si}',dept = '{dept}', CPI='{cpi}', active_backlogs='{ab}' where student_id = {sid} ;"
-    print(query)
-    resultValue = cur.execute(query)
+    query = f"SELECT * FROM student WHERE student_id={sid} FOR UPDATE"
+    cur.execute(query)
+    data = cur.fetchall()
+    # make changes to data
+    query = f"UPDATE student SET student_first_name='{sfn}', student_middle_name='{smn}', student_last_name='{sln}', student_image='{si}', dept='{dept}', CPI='{cpi}', active_backlogs='{ab}' WHERE student_id = {sid}"
+    cur.execute(query)
     mysql.connection.commit()
     cur.close()
     return 'successfully updated'
@@ -1193,7 +1283,7 @@ def next_round_details():
             USER = Occupation.COMPANY_POC
     if(USER == Occupation.STUDENT):
         student_id = session['student_id']
-    if(session['email']=='banthia.shruhrid@gmail.com'):
+    if(session['email']=='mihirsutaria007@gmail.com'):
         USER = Occupation.CDS_EMPLOYEE        
     if USER != Occupation.CDS_EMPLOYEE:
         return jsonify({"error": "Invalid Access"}), 404
@@ -1205,14 +1295,21 @@ def next_round_details():
     round_link = opportunity['round_venue_link']
     # print('---------------------------------Testing round_type------------------------: ', round_type)
     cur = mysql.connection.cursor()
-    cur.execute("UPDATE selection_procedure SET round_type = '"+str(round_type)+"' WHERE selection_procedure.opp_id ="+str(opp_id))
-    mysql.connection.commit()
-    cur.execute("UPDATE selection_procedure SET round_venue_link = '"+str(round_link)+"' WHERE selection_procedure.opp_id ="+str(opp_id))
-    mysql.connection.commit()
-    cur.execute("UPDATE selection_procedure SET round_date = '"+str(round_date)+" 'WHERE selection_procedure.opp_id ="+str(opp_id))
+
+    # Lock the rows to be updated
+    cur.execute("SELECT * FROM selection_procedure WHERE opp_id = %s FOR UPDATE", (opp_id,))
+
+    # Update the rows
+    cur.execute("UPDATE selection_procedure SET round_type = %s WHERE opp_id = %s", (round_type, opp_id))
+    cur.execute("UPDATE selection_procedure SET round_venue_link = %s WHERE opp_id = %s", (round_link, opp_id))
+    cur.execute("UPDATE selection_procedure SET round_date = %s WHERE opp_id = %s", (round_date, opp_id))
+
+    # Commit the changes and release the lock
     mysql.connection.commit()
     cur.close()
+
     return jsonify({"message": "round number increased by one"}), 200
+
 
 
 @app.route('/cds/round_update')
@@ -1226,7 +1323,7 @@ def poc_round_ka():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
-    if session['email'] != 'banthia.shruhrid@gmail.com':
+    if session['email'] != 'mihirsutaria007@gmail.com':
         return 'invalid accesss'
     return render_template('saumil_pages/round_details.html')
 
