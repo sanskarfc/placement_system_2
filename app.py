@@ -36,7 +36,7 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 oauth = OAuth(app)
-@app.route('/google')
+@app.route('/google/')
 def google():   
     # Google Oauth Config
     # Get client_id and client_secret from environment variables
@@ -67,8 +67,11 @@ def google_auth():
     email = token["userinfo"]["email"]
     cur = mysql.connection.cursor()
     resultvalue = cur.execute("SELECT student_id FROM student where student_email_id = '"+email+"';")
+    
+    if session['email'] == 'mihirsutaria007@gmail.com':
+        session['occupation'] = 'cds'
 
-    if resultvalue==0:
+    elif resultvalue==0:
         resultvalue = cur.execute(f"SELECT poc_email_id FROM point_of_contact where poc_email_id = '"+email+"';")
         print(email)
         print(resultvalue)
@@ -82,11 +85,11 @@ def google_auth():
         resultvalue = cur.fetchall()[0][0]
         session['occupation']='student'
         session['student_id']=resultvalue
+        
+
 
     cur.close()
-    if(session['occupation']=='poc'):
-        return redirect(url_for('poc'))
-    return redirect(url_for(session['url']))
+    return redirect(url_for('login_next_page'))
 
 @app.route('/logout')
 def logout():
@@ -94,31 +97,7 @@ def logout():
     return 'You have been logged out.'
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if not ('email' in session ):
-        session['url'] = 'index'
-        return redirect(url_for('google'))
-    USER = session['occupation']
-    match USER:
-        case 'student':
-            USER = Occupation.STUDENT
-        case 'poc':
-            USER = Occupation.COMPANY_POC
-    if(USER ==Occupation.STUDENT ):
-        student_id = session['student_id']
 
-    if request.method == 'POST':
-        # Fetch form data
-        userDetails = request.form
-        name = userDetails['name']
-        email = userDetails['email']
-        cur = mysql.connection.cursor()
-        # cur.execute("INSERT INTO users(name, email) VALUES(%s, %s)",(name, email))
-        mysql.connection.commit()
-        cur.close()
-        return redirect('/tables')
-    return render_template('index.html')
 
 
 ##### for student get requests#####
@@ -994,6 +973,7 @@ def cds_page():
             USER = Occupation.STUDENT
         case 'poc':
             USER = Occupation.COMPANY_POC
+    
     if(session['email']!='mihirsutaria007@gmail.com'):
         return '. off'
     return render_template('saumil_pages/saumil_dashboard2.html')
@@ -1326,6 +1306,42 @@ def poc_round_ka():
     if session['email'] != 'mihirsutaria007@gmail.com':
         return 'invalid accesss'
     return render_template('saumil_pages/round_details.html')
+
+@app.route('/')
+def login_page_render():  
+    return render_template('loginpage.html')
+
+@app.route('/api/login', methods = ['POST'])
+def login_page_acess():
+    data  = request.get_json()
+    session['button'] = data['person']
+    if 'button' not in session:
+        return redirect(url_for('login_page_render'))
+    if(session['button']=='student'):
+        return redirect(url_for('student_dashboard'))
+    elif(session['button'] == 'poc'):
+        return redirect(url_for('poc'))
+    elif(session['button'] == 'cds'):
+        return redirect(url_for('cds_page'))
+    else:
+        return 'invalid_credential'
+    
+
+@app.route('/login__', methods = ['GET'])
+def login_next_page():
+    if 'button' not in session:
+        return redirect(url_for('login_page_render'))
+    if(session['button']==session['occupation']):
+        return redirect(url_for('student_dashboard'))
+    elif(session['button'] == session['occupation']):
+        return redirect(url_for('poc'))
+    elif(session['button'] == session['occupation']):
+        return redirect(url_for('cds_page'))
+    else:
+        return 'invalid_credential'
+    
+
+
 
 
 
